@@ -1,0 +1,23 @@
+<div class="col-md-6 col-lg-4">
+  <div class="property-card">
+    <div class="property-img-wrap">
+      <img src="<%= property.images && property.images.length > 0 ? '/uploads/' + property.images[0] : '/images/placeholder.svg' %>" alt="<%= property.title %>" class="property-img"/>
+      <span class="badge-type badge-<%= property.type %>"><%= property.type === 'sale' ? 'For Sale' : 'For Rent' %></span>
+      <span class="badge-category"><%= property.category %></span>
+    </div>
+    <div class="property-body">
+      <h5 class="property-title"><a href="/properties/<%= property._id %>"><%= property.title %></a></h5>
+      <p class="property-location"><i class="bi bi-geo-alt me-1"></i><%= property.city %></p>
+      <div class="property-price">PKR <%= property.price.toLocaleString() %><%= property.type === 'rent' ? '<span class="fs-6 text-muted">/mo</span>' : '' %></div>
+      <div class="property-features">
+        <span><i class="bi bi-door-open me-1"></i><%= property.bedrooms %> Beds</span>
+        <span><i class="bi bi-droplet me-1"></i><%= property.bathrooms %> Baths</span>
+        <span><i class="bi bi-arrows-angle-expand me-1"></i><%= property.area %> sqft</span>
+      </div>
+      <div class="d-flex gap-2 mt-3">
+        <a href="/properties/<%= property._id %>" class="btn btn-primary btn-sm flex-grow-1">View Details</a>
+        <button class="btn btn-outline-secondary btn-sm compare-btn" data-id="<%= property._id %>" title="Add to compare"><i class="bi bi-bar-chart"></i></button>
+      </div>
+    </div>
+  </div>
+</div>

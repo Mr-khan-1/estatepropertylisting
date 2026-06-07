@@ -1,0 +1,181 @@
+<%- include('../partials/header') %>
+<section class="section-padding">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+
+        <!-- React Image Gallery (replaces Bootstrap carousel) -->
+        <div
+          id="react-image-gallery"
+          data-images="<%- JSON.stringify(property.images || []) %>"
+          data-title="<%= property.title %>"
+        ></div>
+
+        <!-- Title & Actions -->
+        <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+          <div>
+            <h1 class="property-detail-title"><%= property.title %></h1>
+            <p class="text-muted"><i class="bi bi-geo-alt me-1"></i><%= property.address %>, <%= property.city %> <%= property.state %> <%= property.zipCode %></p>
+          </div>
+          <div class="d-flex gap-2">
+            <% if (user) { %>
+              <!-- React Favorite Button (replaces plain JS fetch) -->
+              <div
+                id="react-favorite-btn"
+                data-property-id="<%= property._id %>"
+                data-favorited="<%= userFavorited %>"
+              ></div>
+              <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#flagModal">
+                <i class="bi bi-flag me-1"></i>Report
+              </button>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="detail-card mb-4">
+          <div class="row g-3 text-center">
+            <div class="col-4"><div class="detail-stat"><i class="bi bi-door-open"></i><span><%= property.bedrooms %> Bedrooms</span></div></div>
+            <div class="col-4"><div class="detail-stat"><i class="bi bi-droplet"></i><span><%= property.bathrooms %> Bathrooms</span></div></div>
+            <div class="col-4"><div class="detail-stat"><i class="bi bi-arrows-angle-expand"></i><span><%= property.area %> sqft</span></div></div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="detail-card mb-4">
+          <h4 class="mb-3">About This Property</h4>
+          <p><%= property.description %></p>
+          <% if (property.amenities && property.amenities.length > 0) { %>
+            <h5 class="mt-4 mb-3">Amenities</h5>
+            <div class="d-flex flex-wrap gap-2">
+              <% property.amenities.forEach(a => { %><span class="amenity-badge"><i class="bi bi-check-circle me-1"></i><%= a %></span><% }) %>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Map (Leaflet + OpenStreetMap) -->
+        <% if (property.lat && property.lng) { %>
+          <div class="detail-card mb-4">
+            <h4 class="mb-3">Location</h4>
+            <div id="map" data-lat="<%= property.lat %>" data-lng="<%= property.lng %>" data-title="<%= property.title %>" style="height:300px;border-radius:12px;"></div>
+          </div>
+        <% } %>
+
+        <!-- Reviews -->
+        <div class="detail-card mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Reviews & Ratings</h4>
+            <div class="rating-summary">
+              <span class="rating-big"><%= avgRating %></span>
+              <span class="text-warning ms-1">
+                <% for(let i=1;i<=5;i++){%><i class="bi bi-star<%= i <= Math.round(avgRating) ? '-fill' : '' %>"></i><% } %>
+              </span>
+              <span class="text-muted ms-2">(<%= reviews.length %> reviews)</span>
+            </div>
+          </div>
+          <% if (reviews.length === 0) { %><p class="text-muted">No reviews yet. Be the first!</p><% } %>
+          <% reviews.forEach(r => { %>
+            <div class="review-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong><%= r.user.name %></strong>
+                <span class="text-warning"><% for(let i=1;i<=5;i++){%><i class="bi bi-star<%= i <= r.rating ? '-fill' : '' %>"></i><% } %></span>
+              </div>
+              <p class="mb-0 mt-1 text-muted"><%= r.comment %></p>
+              <small class="text-muted"><%= new Date(r.createdAt).toLocaleDateString() %></small>
+            </div>
+          <% }) %>
+
+          <!-- React Review Form (replaces static HTML form with interactive star rating) -->
+          <% if (user && !userReviewed) { %>
+            <div
+              id="react-review-form"
+              data-property-id="<%= property._id %>"
+            ></div>
+          <% } else if (!user) { %>
+            <div class="alert alert-info mt-3"><a href="/auth/login">Login</a> to write a review</div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="detail-card sticky-top" style="top:80px;">
+          <div class="property-price-big">PKR <%= property.price.toLocaleString() %><%= property.type === 'rent' ? '<span class="fs-6">/mo</span>' : '' %></div>
+          <div class="d-flex gap-2 mb-3">
+            <span class="badge-type badge-<%= property.type %>"><%= property.type === 'sale' ? 'For Sale' : 'For Rent' %></span>
+            <span class="badge bg-secondary text-capitalize"><%= property.category %></span>
+          </div>
+          <hr/>
+          <h5>Contact Agent</h5>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="agent-avatar"><i class="bi bi-person-circle"></i></div>
+            <div><strong><%= property.agent.name %></strong><br/><small class="text-muted"><%= property.agent.email %></small></div>
+          </div>
+          <% if (user) { %>
+            <form action="/properties/<%= property._id %>/inquiry" method="POST">
+              <div class="mb-3"><input type="text" name="email" class="form-control" value="<%= user.email %>" required/></div>
+              <div class="mb-3"><input type="text" name="phone" class="form-control" placeholder="Your phone number"/></div>
+              <div class="mb-3"><textarea name="message" class="form-control" rows="3" placeholder="I'm interested in this property..." required></textarea></div>
+              <button type="submit" class="btn btn-primary w-100">Send Inquiry</button>
+            </form>
+          <% } else { %>
+            <a href="/auth/login" class="btn btn-primary w-100">Login to Inquire</a>
+          <% } %>
+          <hr/>
+          <p class="text-muted small"><i class="bi bi-eye me-1"></i><%= property.views %> views</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related -->
+    <% if (relatedProperties.length > 0) { %>
+    <div class="mt-5">
+      <h3 class="mb-4">Similar Properties in <%= property.city %></h3>
+      <div class="row g-4">
+        <% relatedProperties.forEach(p => { %><%- include('../partials/property-card', { property: p }) %><% }) %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- Flag Modal -->
+<div class="modal fade" id="flagModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Report This Listing</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form action="/properties/<%= property._id %>/flag" method="POST">
+        <div class="modal-body">
+          <label class="form-label">Reason for Reporting</label>
+          <textarea name="reason" class="form-control" rows="3" required placeholder="Describe the issue..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<% if (property.lat && property.lng) { %>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    (function(){
+      const mapEl = document.getElementById('map');
+      if (!mapEl) return;
+      const lat = Number(mapEl.dataset.lat);
+      const lng = Number(mapEl.dataset.lng);
+      const map = L.map('map', { scrollWheelZoom: false }).setView([lat, lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      L.marker([lat, lng]).addTo(map).bindPopup(mapEl.dataset.title || '').openPopup();
+    })();
+  </script>
+<% } %>
+
+<%- include('../partials/footer') %>

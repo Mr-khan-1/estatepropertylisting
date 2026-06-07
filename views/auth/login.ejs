@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+<section class="auth-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="auth-card">
+          <div class="auth-logo"><i class="bi bi-building"></i></div>
+          <h2 class="auth-title">Welcome Back</h2>
+          <p class="auth-sub">Sign in to your EstateHub account</p>
+          <form action="/auth/login" method="POST">
+            <div class="mb-3">
+              <label class="form-label">Email Address</label>
+              <input type="email" name="email" class="form-control" required placeholder="you@example.com"/>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Password</label>
+              <div class="input-group">
+                <input type="password" name="password" id="passwordField" class="form-control" required placeholder="••••••••"/>
+                <button type="button" class="btn btn-outline-secondary" onclick="togglePass()"><i class="bi bi-eye" id="eyeIcon"></i></button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Sign In</button>
+          </form>
+          <hr class="my-4"/>
+          <p class="text-center mb-0">Don't have an account? <a href="/auth/register" class="auth-link">Register here</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>function togglePass(){ const f=document.getElementById('passwordField'); const i=document.getElementById('eyeIcon'); if(f.type==='password'){f.type='text';i.className='bi bi-eye-slash';}else{f.type='password';i.className='bi bi-eye';} }</script>
+<%- include('../partials/footer') %>

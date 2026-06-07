@@ -1,0 +1,71 @@
+<%- include('../partials/header') %>
+<section class="section-padding">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div><h2 class="section-title mb-1">Agent Dashboard</h2><p class="text-muted">Welcome back, <%= user.name %></p></div>
+      <a href="/agent/add-property" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Add New Property</a>
+    </div>
+    <!-- Stats -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-primary"><i class="bi bi-house"></i></div><div><div class="stat-num"><%= totalListings %></div><div class="stat-lbl">Total Listings</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-success"><i class="bi bi-check-circle"></i></div><div><div class="stat-num"><%= approvedListings %></div><div class="stat-lbl">Approved</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-warning"><i class="bi bi-clock"></i></div><div><div class="stat-num"><%= pendingListings %></div><div class="stat-lbl">Pending</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-info"><i class="bi bi-envelope"></i></div><div><div class="stat-num"><%= unreadInquiries %></div><div class="stat-lbl">New Inquiries</div></div></div></div>
+    </div>
+    <div class="row g-4">
+      <!-- My Properties -->
+      <div class="col-lg-8">
+        <div class="detail-card">
+          <h5 class="mb-3">My Listings</h5>
+          <% if (myProperties.length === 0) { %>
+            <div class="text-center py-4"><i class="bi bi-house-x display-4 text-muted"></i><p class="mt-2 text-muted">No properties yet. <a href="/agent/add-property">Add one!</a></p></div>
+          <% } else { %>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead><tr><th>Property</th><th>Price</th><th>Status</th><th>Views</th><th>Actions</th></tr></thead>
+              <tbody>
+                <% myProperties.forEach(p => { %>
+                <tr>
+                  <td><strong><%= p.title %></strong><br/><small class="text-muted"><%= p.city %></small></td>
+                  <td>PKR <%= p.price.toLocaleString() %></td>
+                  <td><span class="badge bg-<%= p.status === 'approved' ? 'success' : p.status === 'pending' ? 'warning' : 'danger' %>"><%= p.status %></span></td>
+                  <td><%= p.views %></td>
+                  <td>
+                    <a href="/properties/<%= p._id %>" class="btn btn-sm btn-outline-primary" target="_blank"><i class="bi bi-eye"></i></a>
+                    <a href="/agent/edit-property/<%= p._id %>" class="btn btn-sm btn-outline-secondary ms-1"><i class="bi bi-pencil"></i></a>
+                    <form action="/agent/property/<%= p._id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Delete this property?')">
+                      <button type="submit" class="btn btn-sm btn-outline-danger ms-1"><i class="bi bi-trash"></i></button>
+                    </form>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <!-- Recent Inquiries -->
+      <div class="col-lg-4">
+        <div class="detail-card">
+          <div class="d-flex justify-content-between mb-3">
+            <h5>Recent Inquiries</h5>
+            <a href="/agent/inquiries" class="btn btn-sm btn-outline-primary">View All</a>
+          </div>
+          <% if (inquiries.length === 0) { %>
+            <p class="text-muted">No inquiries yet.</p>
+          <% } else { %>
+            <% inquiries.forEach(inq => { %>
+              <div class="inquiry-item">
+                <strong><%= inq.sender ? inq.sender.name : 'User' %></strong>
+                <p class="mb-1 small text-muted"><%= inq.property ? inq.property.title : '' %></p>
+                <p class="mb-0 small"><%= inq.message.substring(0, 80) %>...</p>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

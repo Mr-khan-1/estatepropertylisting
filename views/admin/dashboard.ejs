@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+<section class="section-padding">
+  <div class="container">
+    <h2 class="section-title mb-2">Admin Dashboard</h2>
+    <p class="text-muted mb-4">System overview and analytics</p>
+    <!-- Stats -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-primary"><i class="bi bi-house"></i></div><div><div class="stat-num"><%= totalProperties %></div><div class="stat-lbl">Total Properties</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-warning"><i class="bi bi-clock"></i></div><div><div class="stat-num"><%= pendingProperties %></div><div class="stat-lbl">Pending Review</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-success"><i class="bi bi-check-circle"></i></div><div><div class="stat-num"><%= approvedProperties %></div><div class="stat-lbl">Approved</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-danger"><i class="bi bi-flag"></i></div><div><div class="stat-num"><%= flaggedProperties %></div><div class="stat-lbl">Flagged</div></div></div></div>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-info"><i class="bi bi-people"></i></div><div><div class="stat-num"><%= totalUsers %></div><div class="stat-lbl">Total Users</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-secondary"><i class="bi bi-person-badge"></i></div><div><div class="stat-num"><%= totalAgents %></div><div class="stat-lbl">Total Agents</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-primary"><i class="bi bi-envelope"></i></div><div><div class="stat-num"><%= totalInquiries %></div><div class="stat-lbl">Inquiries</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-danger"><i class="bi bi-x-circle"></i></div><div><div class="stat-num"><%= rejectedProperties %></div><div class="stat-lbl">Rejected</div></div></div></div>
+    </div>
+    <div class="row g-4">
+      <!-- React Chart (replaces vanilla Chart.js) -->
+      <div class="col-lg-7">
+        <div class="detail-card">
+          <h5 class="mb-4">Monthly Listings (Last 6 Months)</h5>
+          <div id="react-admin-chart"></div>
+        </div>
+      </div>
+      <!-- Quick Nav -->
+      <div class="col-lg-5">
+        <div class="detail-card">
+          <h5 class="mb-4">Quick Actions</h5>
+          <div class="d-grid gap-3">
+            <a href="/admin/pending" class="btn btn-warning btn-lg"><i class="bi bi-clock me-2"></i>Review Pending Listings <span class="badge bg-white text-warning ms-2"><%= pendingProperties %></span></a>
+            <a href="/admin/flagged" class="btn btn-danger btn-lg"><i class="bi bi-flag me-2"></i>Flagged Properties <span class="badge bg-white text-danger ms-2"><%= flaggedProperties %></span></a>
+            <a href="/admin/properties" class="btn btn-primary btn-lg"><i class="bi bi-house me-2"></i>All Properties</a>
+            <a href="/admin/users" class="btn btn-secondary btn-lg"><i class="bi bi-people me-2"></i>Manage Users</a>
+          </div>
+        </div>
+      </div>
+      <!-- Recent -->
+      <div class="col-12">
+        <div class="detail-card">
+          <h5 class="mb-3">Recent Submissions</h5>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead><tr><th>Title</th><th>Agent</th><th>Type</th><th>Price</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody>
+                <% recentProperties.forEach(p => { %>
+                <tr>
+                  <td><strong><%= p.title %></strong></td>
+                  <td><%= p.agent ? p.agent.name : 'N/A' %></td>
+                  <td><span class="badge-type badge-<%= p.type %>"><%= p.type %></span></td>
+                  <td>PKR <%= p.price.toLocaleString() %></td>
+                  <td><span class="badge bg-<%= p.status === 'approved' ? 'success' : p.status === 'pending' ? 'warning' : 'danger' %>"><%= p.status %></span></td>
+                  <td><%= new Date(p.createdAt).toLocaleDateString() %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Pass monthly data to React component via hidden JSON element -->
+<script id="monthlyCountsData" type="application/json"><%- monthlyCounts %></script>
+<%- include('../partials/footer') %>

@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<section class="section-padding">
+  <div class="container">
+    <h2 class="section-title mb-4">All Properties</h2>
+    <div class="detail-card">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead><tr><th>Title</th><th>Agent</th><th>City</th><th>Price</th><th>Type</th><th>Status</th><th>Views</th><th>Date</th></tr></thead>
+          <tbody>
+            <% properties.forEach(p => { %>
+            <tr>
+              <td><a href="/properties/<%= p._id %>" target="_blank"><strong><%= p.title %></strong></a></td>
+              <td><%= p.agent ? p.agent.name : 'N/A' %></td>
+              <td><%= p.city %></td>
+              <td>PKR <%= p.price.toLocaleString() %></td>
+              <td><span class="badge-type badge-<%= p.type %>"><%= p.type %></span></td>
+              <td><span class="badge bg-<%= p.status === 'approved' ? 'success' : p.status === 'pending' ? 'warning' : 'danger' %>"><%= p.status %></span></td>
+              <td><%= p.views %></td>
+              <td><%= new Date(p.createdAt).toLocaleDateString() %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

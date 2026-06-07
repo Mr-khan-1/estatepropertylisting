@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+<section class="section-padding">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="detail-card">
+          <h3 class="mb-4"><i class="bi bi-plus-circle me-2 text-primary"></i>Add New Property</h3>
+          <form action="/agent/add-property" method="POST" enctype="multipart/form-data">
+            <div class="row g-3">
+              <div class="col-md-8"><label class="form-label">Property Title *</label><input type="text" name="title" class="form-control" required placeholder="e.g. Luxury 3-Bedroom Villa"/></div>
+              <div class="col-md-4"><label class="form-label">Price (PKR) *</label><input type="number" name="price" class="form-control" required placeholder="250000"/></div>
+              <div class="col-md-12"><label class="form-label">Description *</label><textarea name="description" class="form-control" rows="4" required placeholder="Describe the property..."></textarea></div>
+              <div class="col-md-3"><label class="form-label">Listing Type *</label><select name="type" class="form-select" required><option value="sale">For Sale</option><option value="rent">For Rent</option></select></div>
+              <div class="col-md-3"><label class="form-label">Category *</label><select name="category" class="form-select" required><option value="house">House</option><option value="apartment">Apartment</option><option value="condo">Condo</option><option value="land">Land</option><option value="commercial">Commercial</option></select></div>
+              <div class="col-md-2"><label class="form-label">Bedrooms</label><input type="number" name="bedrooms" class="form-control" min="0" value="0"/></div>
+              <div class="col-md-2"><label class="form-label">Bathrooms</label><input type="number" name="bathrooms" class="form-control" min="0" value="0"/></div>
+              <div class="col-md-2"><label class="form-label">Area (sqft)</label><input type="number" name="area" class="form-control" min="0" value="0"/></div>
+              <div class="col-md-6"><label class="form-label">Street Address *</label><input type="text" name="address" class="form-control" required placeholder="123 Main Street"/></div>
+              <div class="col-md-3"><label class="form-label">City *</label><input type="text" name="city" class="form-control" required placeholder="New York"/></div>
+              <div class="col-md-3"><label class="form-label">State</label><input type="text" name="state" class="form-control" placeholder="NY"/></div>
+              <div class="col-md-3"><label class="form-label">Latitude *</label><input type="text" name="lat" class="form-control" required placeholder="33.6844"/></div>
+              <div class="col-md-3"><label class="form-label">Longitude *</label><input type="text" name="lng" class="form-control" required placeholder="73.0479"/></div>
+              <div class="col-12">
+                <small class="text-muted">Enter the property GPS coordinates so the map appears on the property detail page.</small>
+                <label class="form-label mt-2">Amenities</label>
+                <div class="row g-2">
+                  <% ['Parking', 'Pool', 'Gym', 'Garden', 'Security', 'AC', 'WiFi', 'Elevator', 'Pet-Friendly', 'Furnished'].forEach(a => { %>
+                    <div class="col-auto"><div class="form-check"><input class="form-check-input" type="checkbox" name="amenities" value="<%= a %>" id="a_<%= a %>"/><label class="form-check-label" for="a_<%= a %>"><%= a %></label></div></div>
+                  <% }) %>
+                </div>
+              </div>
+              <!-- React Image Preview (replaces jQuery preview) -->
+              <div class="col-12">
+                <label class="form-label">Property Images (Max 10)</label>
+                <div id="react-image-preview"></div>
+              </div>
+              <div class="col-12 d-flex gap-3 mt-2">
+                <button type="submit" class="btn btn-primary btn-lg px-5"><i class="bi bi-send me-2"></i>Submit for Review</button>
+                <a href="/agent/dashboard" class="btn btn-outline-secondary btn-lg">Cancel</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

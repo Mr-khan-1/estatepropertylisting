@@ -1,0 +1,539 @@
+<%- include('../partials/header', {
+  title: typeof title !== 'undefined' ? title : 'Compare Properties',
+  user: typeof user !== 'undefined' ? user : null,
+  success_msg: typeof success_msg !== 'undefined' ? success_msg : '',
+  error_msg: typeof error_msg !== 'undefined' ? error_msg : '',
+  error: typeof error !== 'undefined' ? error : ''
+}) %>
+
+<%
+  var properties = typeof properties !== 'undefined' && Array.isArray(properties) ? properties : [];
+%>
+
+<style>
+/* ===== COMPARE PAGE ===== */
+.compare-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #0f172a 100%);
+  padding: 56px 0 40px;
+  position: relative;
+  overflow: hidden;
+}
+.compare-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 55% 90% at 80% 50%, rgba(37,99,235,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.compare-hero-content { position: relative; z-index: 2; }
+.compare-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.4);
+  color: #fcd34d;
+  border-radius: 30px;
+  padding: 5px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.compare-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+  color: #fff;
+  margin-bottom: 8px;
+}
+.compare-hero p { color: rgba(255,255,255,0.5); font-size: 0.92rem; margin: 0; }
+
+/* Empty state */
+.compare-empty-wrap {
+  min-height: 65vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--light);
+  padding: 60px 0;
+}
+.empty-icon-box {
+  width: 90px; height: 90px;
+  background: #fff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.4rem; color: #94a3b8;
+  margin: 0 auto 22px;
+  transition: border-color 0.2s;
+}
+
+/* Main compare section */
+.compare-section { background: #f1f5f9; padding: 48px 0 72px; }
+
+/* Property header cards */
+.prop-header-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  border: 1.5px solid #e2e8f0;
+  position: relative;
+  height: 100%;
+}
+.prop-header-img {
+  width: 100%; height: 190px;
+  object-fit: cover;
+  display: block;
+}
+.prop-header-body { padding: 18px 20px 20px; }
+.prop-header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: #0f172a;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+.prop-header-title:hover { color: var(--primary); }
+.prop-header-city { font-size: 0.8rem; color: #64748b; margin-bottom: 10px; }
+.prop-header-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 700; color: var(--primary);
+}
+.prop-remove-btn {
+  position: absolute; top: 10px; right: 10px;
+  width: 30px; height: 30px;
+  background: rgba(15,23,42,0.55);
+  border: none; border-radius: 50%;
+  color: #fff; font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.2s, transform 0.15s;
+  backdrop-filter: blur(4px);
+}
+.prop-remove-btn:hover { background: #ef4444; transform: scale(1.1); }
+
+/* Add slot */
+.add-prop-slot {
+  background: #fff;
+  border: 2.5px dashed #cbd5e1;
+  border-radius: 20px;
+  min-height: 310px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 30px 20px;
+  text-decoration: none;
+  transition: border-color 0.25s, background 0.25s, transform 0.2s;
+  color: #94a3b8;
+}
+.add-prop-slot:hover {
+  border-color: var(--primary);
+  background: #eff6ff;
+  color: var(--primary);
+  transform: translateY(-4px);
+}
+.add-prop-slot i { font-size: 2.2rem; margin-bottom: 12px; }
+.add-prop-slot span { font-size: 0.85rem; font-weight: 600; }
+
+/* Comparison table */
+.compare-table-wrap {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1.5px solid #e2e8f0;
+  overflow: hidden;
+  margin-top: 28px;
+}
+.compare-section-header {
+  background: #f8fafc;
+  border-bottom: 1.5px solid #e2e8f0;
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+.compare-section-header span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+.compare-section-header i { color: var(--primary); font-size: 0.95rem; }
+.compare-row {
+  display: grid;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s;
+}
+.compare-row:last-child { border-bottom: none; }
+.compare-row:hover { background: #fafcff; }
+.compare-row-label {
+  padding: 16px 24px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  display: flex; align-items: center; gap: 8px;
+  background: #fafafa;
+  border-right: 1px solid #f1f5f9;
+}
+.compare-row-label i { color: #94a3b8; font-size: 0.9rem; }
+.compare-cell {
+  padding: 16px 20px;
+  font-size: 0.88rem;
+  color: #1e293b;
+  display: flex; align-items: center;
+  border-right: 1px solid #f1f5f9;
+}
+.compare-cell:last-child { border-right: none; }
+.compare-cell.is-best { background: #f0fdf4; color: #15803d; font-weight: 700; }
+.compare-cell.is-worst { background: #fff7ed; }
+.compare-cell.price-cell {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--primary);
+}
+
+/* Mini bar */
+.mini-bar-track { width: 100%; height: 5px; background: #e2e8f0; border-radius: 10px; margin-top: 5px; overflow: hidden; }
+.mini-bar-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+
+/* Amenity chips */
+.amenity-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #eff6ff; color: #2563eb;
+  border-radius: 10px; padding: 3px 10px;
+  font-size: 0.72rem; font-weight: 600; margin: 2px;
+}
+
+/* Dot indicators */
+.dot-indicators { display: flex; gap: 4px; flex-wrap: wrap; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #2563eb; opacity: 0.85; }
+.dot.empty { background: #e2e8f0; opacity: 1; }
+
+/* Action row */
+.action-cell { padding: 18px 20px !important; display: block !important; align-items: unset !important; }
+.btn-view-detail {
+  display: block; width: 100%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 13px; text-align: center;
+  font-weight: 700; font-size: 0.88rem;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.25);
+}
+.btn-view-detail:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(37,99,235,0.35); }
+
+/* Bottom actions */
+.compare-actions { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+</style>
+
+<!-- HERO -->
+<div class="compare-hero">
+  <div class="container compare-hero-content">
+    <div class="compare-pill"><i class="bi bi-bar-chart-line"></i> Compare Tool</div>
+    <h1>Side-by-Side Comparison</h1>
+    <p>Compare up to 3 properties in detail to make the smartest decision</p>
+  </div>
+</div>
+
+<% if (properties.length === 0) { %>
+<!-- EMPTY STATE -->
+<div class="compare-empty-wrap">
+  <div class="text-center">
+    <div class="empty-icon-box"><i class="bi bi-bar-chart"></i></div>
+    <h3 style="font-family:'Playfair Display',serif; color:#0f172a; margin-bottom:10px;">No Properties Selected</h3>
+    <p class="text-muted mb-4" style="max-width:360px; margin:0 auto 24px;">Browse properties and click the <i class="bi bi-bar-chart"></i> icon on any listing to add it here for comparison.</p>
+    <a href="/properties" class="btn btn-primary px-5 py-3" style="border-radius:14px; font-weight:700; font-size:1rem;">
+      <i class="bi bi-house me-2"></i>Browse Properties
+    </a>
+  </div>
+</div>
+
+<% } else { %>
+
+<%
+  const cols = properties.length;
+  const labelCol = '200px';
+  const propCols = Array(cols).fill('1fr').join(' ');
+  const addCol = cols < 3 ? '1fr' : '';
+  const gridCols = `${labelCol} ${propCols}${addCol ? ' ' + addCol : ''}`;
+  const maxPrice = Math.max(...properties.map(p => p.price));
+  const minPrice = Math.min(...properties.map(p => p.price));
+  const maxArea = Math.max(...properties.map(p => p.area));
+  const maxBeds = Math.max(...properties.map(p => p.bedrooms));
+  const maxBaths = Math.max(...properties.map(p => p.bathrooms));
+%>
+
+<div class="compare-section">
+  <div class="container">
+
+    <!-- PROPERTY HEADER CARDS -->
+    <div class="row g-3 align-items-stretch mb-2">
+      <div class="col" style="max-width:200px; flex:0 0 200px;"></div>
+      <% properties.forEach((p, i) => { %>
+      <div class="col">
+        <div class="prop-header-card">
+          <img src="<%= p.images && p.images.length > 0 ? '/uploads/' + p.images[0] : '/images/placeholder.svg' %>" class="prop-header-img" alt="<%= p.title %>"/>
+          <button class="prop-remove-btn" onclick="removeProp('<%= p._id %>')" title="Remove from compare"><i class="bi bi-x"></i></button>
+          <div class="prop-header-body">
+            <a href="/properties/<%= p._id %>" class="prop-header-title"><%= p.title %></a>
+            <div class="prop-header-city"><i class="bi bi-geo-alt me-1"></i><%= p.city %><% if(p.state) { %>, <%= p.state %><% } %></div>
+            <div class="prop-header-price">PKR <%= p.price.toLocaleString() %><% if(p.type === 'rent') { %><span style="font-size:0.7rem; font-weight:400; color:#64748b;"> /mo</span><% } %></div>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+      <% if (cols < 3) { %>
+      <div class="col">
+        <a href="/properties" class="add-prop-slot">
+          <i class="bi bi-plus-circle"></i>
+          <span>Add Another<br/>Property</span>
+        </a>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="compare-table-wrap">
+      <div class="compare-section-header">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>Overview</span>
+      </div>
+      <!-- Type -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-tag"></i>Listing Type</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell">
+          <span class="badge-type badge-<%= p.type %>" style="position:static; font-size:0.75rem;"><%= p.type === 'sale' ? 'For Sale' : 'For Rent' %></span>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Category -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-grid-3x3-gap"></i>Category</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell text-capitalize"><%= p.category %></div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Status -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-shield-check"></i>Status</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell">
+          <span style="color:<%= p.status==='approved'?'#15803d':p.status==='pending'?'#b45309':'#b91c1c' %>; font-weight:600; font-size:0.82rem; text-transform:capitalize;">
+            <i class="bi bi-circle-fill me-1" style="font-size:0.45rem;"></i><%= p.status %>
+          </span>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Views -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-eye"></i>Total Views</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell"><i class="bi bi-eye me-2 text-muted" style="font-size:0.8rem;"></i><%= p.views || 0 %></div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div class="compare-table-wrap">
+      <div class="compare-section-header">
+        <i class="bi bi-currency-dollar"></i>
+        <span>Pricing</span>
+      </div>
+      <!-- Price -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-cash-stack"></i>Listed Price</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell price-cell <%= p.price === minPrice ? 'is-best' : p.price === maxPrice && cols > 1 ? 'is-worst' : '' %>">
+          PKR <%= p.price.toLocaleString() %>
+          <% if (p.price === minPrice && cols > 1) { %><span class="badge bg-success ms-2" style="font-size:0.6rem;">Lowest</span><% } %>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Price per sqft -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-rulers"></i>Price / sqft</div>
+        <%
+          const ppsf = properties.map(p => p.area > 0 ? Math.round(p.price / p.area) : 0);
+          const minPPSF = Math.min(...ppsf.filter(x => x > 0));
+        %>
+        <% properties.forEach((p, i) => { %>
+        <div class="compare-cell <%= ppsf[i] === minPPSF && ppsf[i] > 0 ? 'is-best' : '' %>">
+          <% if (p.area > 0) { %>
+            PKR <%= ppsf[i].toLocaleString() %>/sqft
+            <% if (ppsf[i] === minPPSF && cols > 1) { %><span class="badge bg-success ms-2" style="font-size:0.6rem;">Best</span><% } %>
+          <% } else { %>
+            <span class="text-muted">N/A</span>
+          <% } %>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Relative price bar -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-bar-chart"></i>Relative Price</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell" style="flex-direction:column; align-items:flex-start; gap:4px;">
+          <span style="font-size:0.78rem; color:#64748b;"><%= maxPrice > 0 ? Math.round(p.price/maxPrice*100) : 0 %>% of highest</span>
+          <div class="mini-bar-track" style="width:100%;">
+            <div class="mini-bar-fill" style="width:<%= maxPrice > 0 ? Math.round(p.price/maxPrice*100) : 0 %>%; background:<%= p.price===minPrice?'#10b981':'#2563eb' %>;"></div>
+          </div>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+    </div>
+
+    <!-- SPECIFICATIONS -->
+    <div class="compare-table-wrap">
+      <div class="compare-section-header">
+        <i class="bi bi-house-gear-fill"></i>
+        <span>Specifications</span>
+      </div>
+      <!-- Bedrooms -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-door-open"></i>Bedrooms</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell <%= p.bedrooms === maxBeds && maxBeds > 0 ? 'is-best' : '' %>">
+          <div class="dot-indicators me-2">
+            <% for(let i=0;i<6;i++){%><div class="dot <%= i < p.bedrooms ? '' : 'empty' %>"></div><% } %>
+          </div>
+          <span><%= p.bedrooms %> Bed<%= p.bedrooms !== 1 ? 's' : '' %></span>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Bathrooms -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-droplet"></i>Bathrooms</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell <%= p.bathrooms === maxBaths && maxBaths > 0 ? 'is-best' : '' %>">
+          <div class="dot-indicators me-2">
+            <% for(let i=0;i<5;i++){%><div class="dot <%= i < p.bathrooms ? '' : 'empty' %>" style="<%= i < p.bathrooms ? 'background:#0ea5e9;' : '' %>"></div><% } %>
+          </div>
+          <span><%= p.bathrooms %> Bath<%= p.bathrooms !== 1 ? 's' : '' %></span>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Area -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-arrows-angle-expand"></i>Total Area</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell <%= p.area === maxArea && maxArea > 0 ? 'is-best' : '' %>">
+          <div style="width:100%;">
+            <div style="font-weight:<%= p.area===maxArea?700:400 %>; margin-bottom:5px;"><%= p.area.toLocaleString() %> sqft <% if(p.area===maxArea && cols > 1){%><span class="badge bg-success" style="font-size:0.6rem;">Largest</span><%}%></div>
+            <div class="mini-bar-track">
+              <div class="mini-bar-fill" style="width:<%= maxArea > 0 ? Math.round(p.area/maxArea*100) : 0 %>%; background:<%= p.area===maxArea?'#10b981':'#2563eb' %>;"></div>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Address -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-geo-alt"></i>Location</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell" style="font-size:0.82rem; color:#64748b;">
+          <i class="bi bi-geo-alt me-1"></i><%= p.address || p.city %>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+    </div>
+
+    <!-- AMENITIES & AGENT -->
+    <div class="compare-table-wrap">
+      <div class="compare-section-header">
+        <i class="bi bi-stars"></i>
+        <span>Amenities & Agent</span>
+      </div>
+      <!-- Amenities -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label" style="align-items:flex-start; padding-top:18px;"><i class="bi bi-check2-all"></i>Amenities</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell" style="flex-wrap:wrap; align-items:flex-start; padding-top:14px; padding-bottom:14px; min-height:70px;">
+          <% if (p.amenities && p.amenities.length > 0) { %>
+            <% p.amenities.forEach(a => { %><span class="amenity-chip"><i class="bi bi-check2"></i><%= a %></span><% }) %>
+          <% } else { %>
+            <span style="color:#cbd5e1; font-size:0.82rem;"><i class="bi bi-dash me-1"></i>None listed</span>
+          <% } %>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+      <!-- Agent -->
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>;">
+        <div class="compare-row-label"><i class="bi bi-person-badge"></i>Listed By</div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell">
+          <i class="bi bi-person-circle me-2" style="font-size:1.1rem; color:#94a3b8;"></i>
+          <span><%= p.agent ? p.agent.name : 'N/A' %></span>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+    </div>
+
+    <!-- ACTION ROW -->
+    <div class="compare-table-wrap">
+      <div class="compare-row" style="grid-template-columns: <%= gridCols %>; border:none;">
+        <div class="compare-row-label" style="border-right:1px solid #f1f5f9;"></div>
+        <% properties.forEach(p => { %>
+        <div class="compare-cell action-cell">
+          <a href="/properties/<%= p._id %>" class="btn-view-detail">
+            <i class="bi bi-arrow-right me-2"></i>View Full Details
+          </a>
+        </div>
+        <% }) %>
+        <% if (cols < 3) { %><div class="compare-cell" style="background:#fafafa;"></div><% } %>
+      </div>
+    </div>
+
+    <!-- BOTTOM ACTIONS -->
+    <div class="compare-actions">
+      <a href="/properties" class="btn btn-outline-secondary px-4" style="border-radius:12px; font-weight:600;">
+        <i class="bi bi-arrow-left me-2"></i>Back to Properties
+      </a>
+      <button onclick="clearAllCompare()" class="btn btn-outline-danger px-4" style="border-radius:12px; font-weight:600;">
+        <i class="bi bi-trash me-2"></i>Clear All
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<% } %>
+
+<script>
+  // Sync localStorage with current URL ids
+  (function () {
+    const urlIds = new URLSearchParams(window.location.search).get('ids');
+    if (urlIds) {
+      const ids = urlIds.split(',').filter(Boolean);
+      localStorage.setItem('compareList', JSON.stringify(ids));
+    }
+  })();
+
+  function removeProp(id) {
+    let list = JSON.parse(localStorage.getItem('compareList') || '[]');
+    list = list.filter(x => x !== id);
+    localStorage.setItem('compareList', JSON.stringify(list));
+    if (list.length === 0) {
+      window.location.href = '/properties/compare';
+    } else {
+      window.location.href = '/properties/compare?ids=' + list.join(',');
+    }
+  }
+
+  function clearAllCompare() {
+    localStorage.removeItem('compareList');
+    window.location.href = '/properties/compare';
+  }
+</script>
+
+<%- include('../partials/footer') %>

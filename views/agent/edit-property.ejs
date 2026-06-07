@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+<section class="section-padding">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="detail-card">
+          <h3 class="mb-4"><i class="bi bi-pencil me-2 text-primary"></i>Edit Property</h3>
+          <form action="/agent/edit-property/<%= property._id %>" method="POST" enctype="multipart/form-data">
+            <div class="row g-3">
+              <div class="col-md-8"><label class="form-label">Property Title *</label><input type="text" name="title" class="form-control" required value="<%= property.title %>"/></div>
+              <div class="col-md-4"><label class="form-label">Price (PKR) *</label><input type="number" name="price" class="form-control" required value="<%= property.price %>"/></div>
+              <div class="col-md-12"><label class="form-label">Description *</label><textarea name="description" class="form-control" rows="4" required><%= property.description %></textarea></div>
+              <div class="col-md-3"><label class="form-label">Listing Type *</label><select name="type" class="form-select"><option value="sale" <%= property.type === 'sale' ? 'selected' : '' %>>For Sale</option><option value="rent" <%= property.type === 'rent' ? 'selected' : '' %>>For Rent</option></select></div>
+              <div class="col-md-3"><label class="form-label">Category *</label><select name="category" class="form-select"><option value="house" <%= property.category === 'house' ? 'selected' : '' %>>House</option><option value="apartment" <%= property.category === 'apartment' ? 'selected' : '' %>>Apartment</option><option value="condo" <%= property.category === 'condo' ? 'selected' : '' %>>Condo</option><option value="land" <%= property.category === 'land' ? 'selected' : '' %>>Land</option><option value="commercial" <%= property.category === 'commercial' ? 'selected' : '' %>>Commercial</option></select></div>
+              <div class="col-md-2"><label class="form-label">Bedrooms</label><input type="number" name="bedrooms" class="form-control" value="<%= property.bedrooms %>"/></div>
+              <div class="col-md-2"><label class="form-label">Bathrooms</label><input type="number" name="bathrooms" class="form-control" value="<%= property.bathrooms %>"/></div>
+              <div class="col-md-2"><label class="form-label">Area (sqft)</label><input type="number" name="area" class="form-control" value="<%= property.area %>"/></div>
+              <div class="col-md-6"><label class="form-label">Street Address *</label><input type="text" name="address" class="form-control" required value="<%= property.address %>"/></div>
+              <div class="col-md-3"><label class="form-label">City *</label><input type="text" name="city" class="form-control" required value="<%= property.city %>"/></div>
+              <div class="col-md-3"><label class="form-label">State</label><input type="text" name="state" class="form-control" value="<%= property.state %>"/></div>
+              <div class="col-md-3"><label class="form-label">Latitude</label><input type="text" name="lat" class="form-control" value="<%= property.lat %>" placeholder="33.6844"/></div>
+              <div class="col-md-3"><label class="form-label">Longitude</label><input type="text" name="lng" class="form-control" value="<%= property.lng %>" placeholder="73.0479"/></div>
+              <div class="col-12">
+                <small class="text-muted">Update the GPS coordinates to enable the map on the property detail page.</small>
+                <label class="form-label mt-2">Amenities</label>
+                <div class="row g-2">
+                  <% ['Parking', 'Pool', 'Gym', 'Garden', 'Security', 'AC', 'WiFi', 'Elevator', 'Pet-Friendly', 'Furnished'].forEach(a => { %>
+                    <div class="col-auto"><div class="form-check"><input class="form-check-input" type="checkbox" name="amenities" value="<%= a %>" id="a_<%= a %>" <%= property.amenities && property.amenities.includes(a) ? 'checked' : '' %>/><label class="form-check-label" for="a_<%= a %>"><%= a %></label></div></div>
+                  <% }) %>
+                </div>
+              </div>
+              <!-- React Image Preview for replacement images -->
+              <div class="col-12">
+                <label class="form-label">Replace Images (optional)</label>
+                <div id="react-image-preview"></div>
+                <% if (property.images && property.images.length > 0) { %>
+                  <div class="mt-2 d-flex flex-wrap gap-2">
+                    <% property.images.forEach((img, i) => { %>
+                      <div style="position:relative;display:inline-block;">
+                        <img src="/uploads/<%= img %>" style="width:72px;height:54px;object-fit:cover;border-radius:8px;border:2px solid #e2e8f0;" alt="Current image"/>
+                        <% if (i === 0) { %><span style="position:absolute;bottom:2px;left:2px;background:#2563eb;color:#fff;font-size:0.6rem;padding:1px 5px;border-radius:4px;">Current</span><% } %>
+                      </div>
+                    <% }) %>
+                  </div>
+                  <small class="text-muted d-block mt-1">Upload new images above to replace these.</small>
+                <% } %>
+              </div>
+              <div class="col-12 d-flex gap-3 mt-2">
+                <button type="submit" class="btn btn-primary btn-lg px-5"><i class="bi bi-save me-2"></i>Save Changes</button>
+                <a href="/agent/dashboard" class="btn btn-outline-secondary btn-lg">Cancel</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>
