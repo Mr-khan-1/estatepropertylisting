@@ -1,0 +1,25 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 30
+      arrivalRate: 10
+      rampTo: 50
+      name: "Ramp to heavy load"
+    - duration: 30
+      arrivalRate: 50
+      rampTo: 100
+      name: "Spike to extreme load"
+    - duration: 30
+      arrivalRate: 100
+      name: "Sustained extreme load"
+scenarios:
+  - name: "Stress testing property search and static pages"
+    flow:
+      - get:
+          url: "/"
+      - get:
+          url: "/properties?type=sale"
+      - get:
+          url: "/properties?city=Lahore"
+      - get:
+          url: "/auth/login"

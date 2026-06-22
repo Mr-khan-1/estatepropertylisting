@@ -5,7 +5,7 @@
  * Validates user registration input.
  * Returns { valid: true } or { valid: false, error: '...' }
  */
-function validateRegistration({ name, email, password, role }) {
+function validateRegistration({ name, email, password, role } = {}) {
   if (!name || name.trim().length < 2) {
     return { valid: false, error: 'Name must be at least 2 characters' };
   }
@@ -27,11 +27,17 @@ function validateRegistration({ name, email, password, role }) {
  * Validates a property listing input.
  * Returns { valid: true } or { valid: false, error: '...' }
  */
-function validateProperty({ title, price, location, propertyType, bedrooms }) {
+function validateProperty({ title, price, location, propertyType, bedrooms } = {}) {
   if (!title || title.trim().length < 3) {
     return { valid: false, error: 'Title must be at least 3 characters' };
   }
-  if (price === undefined || price === null || isNaN(price) || price <= 0) {
+  if (
+    price === undefined ||
+    price === null ||
+    typeof price !== 'number' ||
+    isNaN(price) ||
+    price <= 0
+  ) {
     return { valid: false, error: 'Price must be a positive number' };
   }
   if (!location || location.trim().length === 0) {
@@ -51,15 +57,20 @@ function validateProperty({ title, price, location, propertyType, bedrooms }) {
  * Validates a review submission.
  * Returns { valid: true } or { valid: false, error: '...' }
  */
-function validateReview({ rating, comment }) {
-  if (rating === undefined || rating === null || isNaN(rating)) {
-    return { valid: false, error: 'Rating is required' };
+function validateReview({ rating, comment } = {}) {
+  if (
+    rating === undefined ||
+    rating === null ||
+    typeof rating !== 'number' ||
+    isNaN(rating)
+  ) {
+    return { valid: false, error: 'Rating is required and must be a number' };
+  }
+  if (!Number.isInteger(rating)) {
+    return { valid: false, error: 'Rating must be a whole number' };
   }
   if (rating < 1 || rating > 5) {
     return { valid: false, error: 'Rating must be between 1 and 5' };
-  }
-  if (!Number.isInteger(Number(rating))) {
-    return { valid: false, error: 'Rating must be a whole number' };
   }
   if (comment && comment.length > 1000) {
     return { valid: false, error: 'Comment must not exceed 1000 characters' };
@@ -71,11 +82,19 @@ function validateReview({ rating, comment }) {
  * Filters properties by search criteria.
  * Returns filtered array — pure function, no DB needed.
  */
-function filterProperties(properties, { minPrice, maxPrice, location, propertyType, minBedrooms } = {}) {
+function filterProperties(
+  properties,
+  { minPrice, maxPrice, location, propertyType, minBedrooms } = {}
+) {
+  if (!properties) return [];
   return properties.filter((p) => {
     if (minPrice !== undefined && p.price < minPrice) return false;
     if (maxPrice !== undefined && p.price > maxPrice) return false;
-    if (location && !p.location.toLowerCase().includes(location.toLowerCase())) return false;
+    if (
+      location &&
+      !p.location.toLowerCase().includes(location.toLowerCase())
+    )
+      return false;
     if (propertyType && p.propertyType !== propertyType) return false;
     if (minBedrooms !== undefined && p.bedrooms < minBedrooms) return false;
     return true;
@@ -88,7 +107,7 @@ function filterProperties(properties, { minPrice, maxPrice, location, propertyTy
 function calculateAverageRating(reviews) {
   if (!reviews || reviews.length === 0) return 0;
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-  return Math.round((sum / reviews.length) * 10) / 10; // 1 decimal place
+  return Math.round((sum / reviews.length) * 10) / 10;
 }
 
 /**
@@ -97,7 +116,10 @@ function calculateAverageRating(reviews) {
  */
 function formatPrice(price, currency = 'PKR') {
   if (isNaN(price) || price < 0) return 'Invalid price';
-  return new Intl.NumberFormat('en-PK', { style: 'currency', currency }).format(price);
+  return new Intl.NumberFormat('en-PK', {
+    style: 'currency',
+    currency,
+  }).format(price);
 }
 
 module.exports = {

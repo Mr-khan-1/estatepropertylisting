@@ -1,0 +1,56 @@
+<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="2" time="15.334759">
+<testsuite name="screenshot-capture.spec.js" timestamp="2026-06-22T15:25:03.625Z" hostname="chromium" tests="1" failures="0" skipped="0" time="12.845" errors="0">
+<testcase name="Screenshot Capture for Report › Capture main pages" classname="screenshot-capture.spec.js" time="12.845">
+</testcase>
+</testsuite>
+<testsuite name="screenshot-capture.spec.js" timestamp="2026-06-22T15:25:03.625Z" hostname="firefox" tests="1" failures="0" skipped="0" time="0.005" errors="1">
+<testcase name="Screenshot Capture for Report › Capture main pages" classname="screenshot-capture.spec.js" time="0.005">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|screenshot-capture-Screens-4110c-r-Report-Capture-main-pages-firefox\error-context.md]]
+]]>
+</system-out>
+<error message="browserType.launch: Executable doesn&apos;t exist at C:\Users\muham\AppData\Local\ms-playwright\firefox-1532\firefox\firefox.exe" type="Error">
+<![CDATA[  [firefox] › screenshot-capture.spec.js:4:3 › Screenshot Capture for Report › Capture main pages ──
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\muham\AppData\Local\ms-playwright\firefox-1532\firefox\firefox.exe
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: ..\..\test-results\screenshot-capture-Screens-4110c-r-Report-Capture-main-pages-firefox\error-context.md
+]]>
+</error>
+</testcase>
+</testsuite>
+<testsuite name="screenshot-capture.spec.js" timestamp="2026-06-22T15:25:03.625Z" hostname="webkit" tests="1" failures="0" skipped="0" time="0.02" errors="1">
+<testcase name="Screenshot Capture for Report › Capture main pages" classname="screenshot-capture.spec.js" time="0.02">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|screenshot-capture-Screens-4110c-r-Report-Capture-main-pages-webkit\error-context.md]]
+]]>
+</system-out>
+<error message="browserType.launch: Executable doesn&apos;t exist at C:\Users\muham\AppData\Local\ms-playwright\webkit-2311\Playwright.exe" type="Error">
+<![CDATA[  [webkit] › screenshot-capture.spec.js:4:3 › Screenshot Capture for Report › Capture main pages ───
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\muham\AppData\Local\ms-playwright\webkit-2311\Playwright.exe
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: ..\..\test-results\screenshot-capture-Screens-4110c-r-Report-Capture-main-pages-webkit\error-context.md
+]]>
+</error>
+</testcase>
+</testsuite>
+</testsuites>

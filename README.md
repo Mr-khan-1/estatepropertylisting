@@ -82,3 +82,17 @@ estate2.0/
 │           └── AdminChart.js
 └── uploads/                        # Property images (auto-created)
 ```
+
+## Testing
+
+The application includes comprehensive testing strategies to ensure stability and performance:
+- **API and Unit Tests**: Powered by Jest & Supertest to ensure the backend logic and routes are solid.
+- **UI and Screenshot Tests**: Automated UI validation and full-page screenshots using Playwright.
+- **Load and Stress Testing**: Configured using Artillery (`tests/load_test.yml`, `tests/stress_test.yml`) to evaluate the backend's stability under high concurrent traffic.
+
+## Collaborators and Team
+
+This project is brought to life through the collaborative efforts of our team:
+- **Abdullah and Asif**: UI Development & Manual Testing
+- **Rana Hammad and Muhammad**: Backend Development, Automated Testing, & Load Testing
+

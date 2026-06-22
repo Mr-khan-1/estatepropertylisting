@@ -1,0 +1,21 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 20
+      name: "Ramp up load"
+    - duration: 60
+      arrivalRate: 20
+      name: "Sustained load"
+scenarios:
+  - name: "Browsing properties and checking auth pages"
+    flow:
+      - get:
+          url: "/"
+      - get:
+          url: "/properties"
+      - get:
+          url: "/auth/login"
+      - get:
+          url: "/auth/register"
