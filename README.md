@@ -93,6 +93,17 @@ The application includes comprehensive testing strategies to ensure stability an
 ## Collaborators and Team
 
 This project is brought to life through the collaborative efforts of our team:
-- **Abdullah and Asif**: UI Development & Manual Testing
-- **Rana Hammad and Muhammad**: Backend Development, Automated Testing, & Load Testing
+
+- **Abdullah** ([@abdullahkhalidawan05](https://github.com/abdullahkhalidawan05))
+  - **Role**: UI Development & Manual Testing
+  - **Status**: Pending Invite (Awaiting Response)
+- **Asif** ([@masif078](https://github.com/masif078))
+  - **Role**: UI Development & Manual Testing
+  - **Status**: Collaborator
+- **Rana Hammad** ([@RanaHammadMushtaq](https://github.com/RanaHammadMushtaq))
+  - **Role**: Backend Development & Automated Testing
+  - **Status**: Collaborator
+- **Muhammad** ([@Mr-khan-1](https://github.com/Mr-khan-1))
+  - **Role**: Backend Development, Automated Testing, & Load Testing
+  - **Status**: Project Owner / Collaborator
 

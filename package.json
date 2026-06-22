@@ -2,6 +2,25 @@
   "name": "estate2.0",
   "version": "2.0.0",
   "description": "Real Estate Property Listing and Management System with Playwright Testing",
+  "author": "Muhammad (https://github.com/Mr-khan-1)",
+  "contributors": [
+    {
+      "name": "Muhammad",
+      "url": "https://github.com/Mr-khan-1"
+    },
+    {
+      "name": "Asif",
+      "url": "https://github.com/masif078"
+    },
+    {
+      "name": "Rana Hammad Mushtaq",
+      "url": "https://github.com/RanaHammadMushtaq"
+    },
+    {
+      "name": "Abdullah Khalid Awan",
+      "url": "https://github.com/abdullahkhalidawan05"
+    }
+  ],
   "type": "module",
   "main": "app.js",
   "scripts": {
